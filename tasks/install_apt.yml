@@ -99,13 +99,15 @@
 # such we validate that the register is a mapping (dict).
 - name: Update Apt cache
   apt:
-    update_cache: yes
+#    update_cache: yes
+# Added by Fuad Yimer
+    update_cache: no
   when:
     - (add_rabbitmq_repos is mapping and add_rabbitmq_repos is changed) or
       (add_erlang_repos is mapping and add_erlang_repos is changed)
   register: update_apt_cache
   until: update_apt_cache is success
-  retries: 5
+  retries: 10
   delay: 2
   tags:
     - rabbitmq-repos
@@ -114,11 +116,11 @@
   apt:
     pkg: "{{ rabbitmq_dependencies }}"
     state: "{{ rabbitmq_package_state }}"
-    update_cache: yes
+    update_cache: no
     cache_valid_time: "{{ cache_timeout }}"
   register: install_packages
   until: install_packages is success
-  retries: 5
+  retries: 10
   delay: 2
   tags:
     - rabbitmq-apt-packages
@@ -139,7 +141,7 @@
     state: "{{ rabbitmq_package_state }}"
   register: install_packages
   until: install_packages is success
-  retries: 5
+  retries: 10
   delay: 2
   when:
     - rabbitmq_install_method != 'file'
